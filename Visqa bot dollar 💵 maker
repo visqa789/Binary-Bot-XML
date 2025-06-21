@@ -1,0 +1,200 @@
+<xml xmlns="http://www.w3.org/1999/xhtml">
+  <variables>
+    <variable>initial_stake</variable>
+    <variable>current_stake</variable>
+    <variable>total_profit</variable>
+    <variable>take_profit</variable>
+    <variable>stop_loss</variable>
+  </variables>
+  <block type="bot_start" x="10" y="10">
+    <next>
+      <block type="variables_set">
+        <field name="VAR">initial_stake</field>
+        <value name="VALUE">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <next>
+          <block type="variables_set">
+            <field name="VAR">current_stake</field>
+            <value name="VALUE">
+              <block type="variables_get">
+                <field name="VAR">initial_stake</field>
+              </block>
+            </value>
+            <next>
+              <block type="variables_set">
+                <field name="VAR">total_profit</field>
+                <value name="VALUE">
+                  <block type="math_number">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+                <next>
+                  <block type="variables_set">
+                    <field name="VAR">take_profit</field>
+                    <value name="VALUE">
+                      <block type="math_number">
+                        <field name="NUM">5</field>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="variables_set">
+                        <field name="VAR">stop_loss</field>
+                        <value name="VALUE">
+                          <block type="math_number">
+                            <field name="NUM">5</field>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="trade_definition">
+                            <field name="ACCOUNT_TYPE">REAL</field>
+                            <field name="MARKET">synthetic_index</field>
+                            <field name="SYMBOL">R_75</field>
+                            <field name="CONTRACT_TYPE">CALL</field>
+                            <field name="DURATION">1</field>
+                            <field name="DURATION_UNIT">t</field>
+                            <field name="BASIS">stake</field>
+                            <field name="AMOUNT">1</field>
+                            <field name="CURRENCY">USD</field>
+                            <next>
+                              <block type="trade_again">
+                                <next>
+                                  <block type="purchase_completed">
+                                    <next>
+                                      <block type="controls_if">
+                                        <value name="IF0">
+                                          <block type="purchase_won"/>
+                                        </value>
+                                        <statement name="DO0">
+                                          <block type="variables_set">
+                                            <field name="VAR">current_stake</field>
+                                            <value name="VALUE">
+                                              <block type="variables_get">
+                                                <field name="VAR">initial_stake</field>
+                                              </block>
+                                            </value>
+                                            <next>
+                                              <block type="variables_set">
+                                                <field name="VAR">total_profit</field>
+                                                <value name="VALUE">
+                                                  <block type="math_arithmetic">
+                                                    <field name="OP">ADD</field>
+                                                    <value name="A">
+                                                      <block type="variables_get">
+                                                        <field name="VAR">total_profit</field>
+                                                      </block>
+                                                    </value>
+                                                    <value name="B">
+                                                      <block type="profit"/>
+                                                    </value>
+                                                  </block>
+                                                </value>
+                                              </block>
+                                            </next>
+                                          </block>
+                                        </statement>
+                                        <else>
+                                          <block type="variables_set">
+                                            <field name="VAR">current_stake</field>
+                                            <value name="VALUE">
+                                              <block type="math_arithmetic">
+                                                <field name="OP">MULTIPLY</field>
+                                                <value name="A">
+                                                  <block type="variables_get">
+                                                    <field name="VAR">current_stake</field>
+                                                  </block>
+                                                </value>
+                                                <value name="B">
+                                                  <block type="math_number">
+                                                    <field name="NUM">2</field>
+                                                  </block>
+                                                </value>
+                                              </block>
+                                            </value>
+                                            <next>
+                                              <block type="variables_set">
+                                                <field name="VAR">total_profit</field>
+                                                <value name="VALUE">
+                                                  <block type="math_arithmetic">
+                                                    <field name="OP">SUBTRACT</field>
+                                                    <value name="A">
+                                                      <block type="variables_get">
+                                                        <field name="VAR">total_profit</field>
+                                                      </block>
+                                                    </value>
+                                                    <value name="B">
+                                                      <block type="stake"/>
+                                                    </value>
+                                                  </block>
+                                                </value>
+                                              </block>
+                                            </next>
+                                          </block>
+                                        </else>
+                                        <next>
+                                          <block type="controls_if">
+                                            <value name="IF0">
+                                              <block type="logic_or">
+                                                <value name="A">
+                                                  <block type="logic_compare">
+                                                    <field name="OP">GTE</field>
+                                                    <value name="A">
+                                                      <block type="variables_get">
+                                                        <field name="VAR">total_profit</field>
+                                                      </block>
+                                                    </value>
+                                                    <value name="B">
+                                                      <block type="variables_get">
+                                                        <field name="VAR">take_profit</field>
+                                                      </block>
+                                                    </value>
+                                                  </block>
+                                                </value>
+                                                <value name="B">
+                                                  <block type="logic_compare">
+                                                    <field name="OP">LTE</field>
+                                                    <value name="A">
+                                                      <block type="variables_get">
+                                                        <field name="VAR">total_profit</field>
+                                                      </block>
+                                                    </value>
+                                                    <value name="B">
+                                                      <block type="math_negative">
+                                                        <value name="NUM">
+                                                          <block type="variables_get">
+                                                            <field name="VAR">stop_loss</field>
+                                                          </block>
+                                                        </value>
+                                                      </block>
+                                                    </value>
+                                                  </block>
+                                                </value>
+                                              </block>
+                                            </value>
+                                            <statement name="DO0">
+                                              <block type="bot_stop"/>
+                                            </statement>
+                                          </block>
+                                        </next>
+                                      </block>
+                                    </next>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </next>
+  </block>
+</xml>
